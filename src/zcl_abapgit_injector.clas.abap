@@ -24,7 +24,12 @@ CLASS zcl_abapgit_injector DEFINITION
       set_syntax_check
         IMPORTING
           iv_package      TYPE devclass
-          ii_syntax_check TYPE REF TO zif_abapgit_code_inspector.
+          ii_syntax_check TYPE REF TO zif_abapgit_code_inspector,
+
+      set_branch_overview
+        IMPORTING
+          io_repo            TYPE REF TO zcl_abapgit_repo_online
+          ii_branch_overview TYPE REF TO zif_abapgit_branch_overview.
 
 ENDCLASS.
 
@@ -103,6 +108,31 @@ CLASS zcl_abapgit_injector IMPLEMENTATION.
     ENDIF.
 
     <ls_syntax_check>-instance = ii_syntax_check.
+
+  ENDMETHOD.
+
+  METHOD set_branch_overview.
+
+    DATA: ls_branch_overview LIKE LINE OF zcl_abapgit_factory=>gt_branch_overview,
+          lv_repo_key        TYPE zif_abapgit_persistence=>ty_value.
+    FIELD-SYMBOLS: <ls_branch_overview> LIKE LINE OF zcl_abapgit_factory=>gt_branch_overview.
+
+    lv_repo_key = io_repo->get_key( ).
+
+    READ TABLE zcl_abapgit_factory=>gt_branch_overview
+         ASSIGNING <ls_branch_overview>
+         WITH TABLE KEY repo_key = lv_repo_key.
+    IF sy-subrc <> 0.
+
+      ls_branch_overview-repo_key = lv_repo_key.
+
+      INSERT ls_branch_overview
+             INTO TABLE zcl_abapgit_factory=>gt_branch_overview
+             ASSIGNING <ls_branch_overview>.
+
+    ENDIF.
+
+    <ls_branch_overview>-instance = ii_branch_overview.
 
   ENDMETHOD.
 
