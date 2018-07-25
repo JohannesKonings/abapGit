@@ -1,5 +1,5 @@
 CLASS ltcl_check_branch_overview DEFINITION FINAL FOR TESTING
-  DURATION SHORT
+  DURATION MEDIUM
   RISK LEVEL HARMLESS.
 
   PRIVATE SECTION.
@@ -45,8 +45,10 @@ CLASS ltcl_check_branch_overview IMPLEMENTATION.
 
     DATA: ls_data TYPE zif_abapgit_persistence=>ty_repo.
 
-    ls_data-key     = 'dummmy'.
-    ls_data-package = '$DUMMY'.
+    ls_data-key         = 'dummmy'.
+    ls_data-package     = '$DUMMY'.
+    ls_data-url         = 'https://github.com/abapGit-tests/CLAS.git'. "'https://dummydomain.com/dummyuser/dummyrepo.git'.
+    ls_data-branch_name = 'refs/heads/master'.
 
     CREATE OBJECT mo_repo_online
       EXPORTING

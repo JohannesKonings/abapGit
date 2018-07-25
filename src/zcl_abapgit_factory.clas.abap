@@ -1,41 +1,41 @@
-class ZCL_ABAPGIT_FACTORY definition
-  public
-  create private
+CLASS zcl_abapgit_factory DEFINITION
+  PUBLIC
+  CREATE PRIVATE
 
-  global friends ZCL_ABAPGIT_INJECTOR .
+  GLOBAL FRIENDS zcl_abapgit_injector .
 
-public section.
+  PUBLIC SECTION.
 
-  class-methods GET_TADIR
-    returning
-      value(RI_TADIR) type ref to ZIF_ABAPGIT_TADIR .
-  class-methods GET_SAP_PACKAGE
-    importing
-      !IV_PACKAGE type DEVCLASS
-    returning
-      value(RI_SAP_PACKAGE) type ref to ZIF_ABAPGIT_SAP_PACKAGE .
-  class-methods GET_CODE_INSPECTOR
-    importing
-      !IV_PACKAGE type DEVCLASS
-      !IV_CHECK_VARIANT_NAME type SCI_CHKV
-    returning
-      value(RI_CODE_INSPECTOR) type ref to ZIF_ABAPGIT_CODE_INSPECTOR
-    raising
-      ZCX_ABAPGIT_EXCEPTION .
-  class-methods GET_SYNTAX_CHECK
-    importing
-      !IV_PACKAGE type DEVCLASS
-    returning
-      value(RI_SYNTAX_CHECK) type ref to ZIF_ABAPGIT_CODE_INSPECTOR
-    raising
-      ZCX_ABAPGIT_EXCEPTION .
-  class-methods GET_BRANCH_OVERVIEW
-    importing
-      !IO_REPO type ref to ZCL_ABAPGIT_REPO_ONLINE
-    returning
-      value(RI_BRANCH_OVERVIEW) type ref to ZIF_ABAPGIT_BRANCH_OVERVIEW
-    raising
-      ZCX_ABAPGIT_EXCEPTION .
+    CLASS-METHODS get_tadir
+      RETURNING
+        VALUE(ri_tadir) TYPE REF TO zif_abapgit_tadir .
+    CLASS-METHODS get_sap_package
+      IMPORTING
+        !iv_package           TYPE devclass
+      RETURNING
+        VALUE(ri_sap_package) TYPE REF TO zif_abapgit_sap_package .
+    CLASS-METHODS get_code_inspector
+      IMPORTING
+        !iv_package              TYPE devclass
+        !iv_check_variant_name   TYPE sci_chkv
+      RETURNING
+        VALUE(ri_code_inspector) TYPE REF TO zif_abapgit_code_inspector
+      RAISING
+        zcx_abapgit_exception .
+    CLASS-METHODS get_syntax_check
+      IMPORTING
+        !iv_package            TYPE devclass
+      RETURNING
+        VALUE(ri_syntax_check) TYPE REF TO zif_abapgit_code_inspector
+      RAISING
+        zcx_abapgit_exception .
+    CLASS-METHODS get_branch_overview
+      IMPORTING
+        !io_repo                  TYPE REF TO zcl_abapgit_repo_online
+      RETURNING
+        VALUE(ri_branch_overview) TYPE REF TO zif_abapgit_branch_overview
+      RAISING
+        zcx_abapgit_exception .
   PRIVATE SECTION.
     TYPES:
       BEGIN OF ty_sap_package,
@@ -77,7 +77,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_ABAPGIT_FACTORY IMPLEMENTATION.
+CLASS zcl_abapgit_factory IMPLEMENTATION.
 
 
   METHOD get_branch_overview.
@@ -99,6 +99,8 @@ CLASS ZCL_ABAPGIT_FACTORY IMPLEMENTATION.
         TYPE zcl_abapgit_branch_overview
         EXPORTING
           io_repo = io_repo.
+
+      ASSIGN ls_branch_overview TO <ls_branch_overview>.
 
     ENDIF.
 
