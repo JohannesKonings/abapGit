@@ -279,11 +279,7 @@ CLASS zcl_abapgit_dot_abapgit IMPLEMENTATION.
 
     rv_xml = zcl_abapgit_xml_pretty=>print( rv_xml ).
 
-    REPLACE FIRST OCCURRENCE
-      OF REGEX '<\?xml version="1\.0" encoding="[\w-]+"\?>'
-      IN rv_xml
-      WITH '<?xml version="1.0" encoding="utf-8"?>'.
-    ASSERT sy-subrc = 0.
+    rv_xml = zcl_abapgit_xml_encoding=>change_encoding_to_utf8( iv_xml = rv_xml ).
 
   ENDMETHOD.
 

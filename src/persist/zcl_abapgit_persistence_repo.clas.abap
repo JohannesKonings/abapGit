@@ -30,7 +30,9 @@ CLASS zcl_abapgit_persistence_repo DEFINITION
       IMPORTING
         !is_repo                  TYPE zif_abapgit_persistence=>ty_repo
       RETURNING
-        VALUE(rv_repo_xml_string) TYPE string .
+        VALUE(rv_repo_xml_string) TYPE string
+      RAISING
+        zcx_abapgit_exception.
     METHODS get_next_id
       RETURNING
         VALUE(rv_next_repo_id) TYPE zif_abapgit_persistence=>ty_content-value
@@ -40,7 +42,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_ABAPGIT_PERSISTENCE_REPO IMPLEMENTATION.
+CLASS zcl_abapgit_persistence_repo IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -118,6 +120,9 @@ CLASS ZCL_ABAPGIT_PERSISTENCE_REPO IMPLEMENTATION.
     CALL TRANSFORMATION id
       SOURCE repo = ls_xml
       RESULT XML rv_repo_xml_string.
+
+    rv_repo_xml_string = zcl_abapgit_xml_encoding=>change_encoding_to_utf8( iv_xml = rv_repo_xml_string ).
+
   ENDMETHOD.
 
 

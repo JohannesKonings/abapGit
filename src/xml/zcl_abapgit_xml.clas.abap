@@ -19,7 +19,8 @@ CLASS zcl_abapgit_xml DEFINITION
 
     METHODS to_xml
       IMPORTING iv_normalize  TYPE sap_bool DEFAULT abap_true
-      RETURNING VALUE(rv_xml) TYPE string.
+      RETURNING VALUE(rv_xml) TYPE string
+      RAISING   zcx_abapgit_exception.
 
     METHODS parse
       IMPORTING iv_normalize TYPE abap_bool DEFAULT abap_true
@@ -38,7 +39,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_ABAPGIT_XML IMPLEMENTATION.
+CLASS zcl_abapgit_xml IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -156,6 +157,8 @@ CLASS ZCL_ABAPGIT_XML IMPLEMENTATION.
     li_renderer->set_normalizing( iv_normalize ).
 
     li_renderer->render( ).
+
+    rv_xml = zcl_abapgit_xml_encoding=>change_encoding_to_utf8( iv_xml = rv_xml ).
 
   ENDMETHOD.
 ENDCLASS.

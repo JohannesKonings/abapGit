@@ -26,7 +26,9 @@ CLASS zcl_abapgit_xml_output DEFINITION
         !iv_normalize TYPE sap_bool DEFAULT abap_true
         !is_metadata  TYPE zif_abapgit_definitions=>ty_metadata OPTIONAL
       RETURNING
-        VALUE(rv_xml) TYPE string .
+        VALUE(rv_xml) TYPE string
+      RAISING
+        zcx_abapgit_exception.
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA: mi_raw  TYPE REF TO if_ixml_element.
@@ -35,7 +37,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_ABAPGIT_XML_OUTPUT IMPLEMENTATION.
+CLASS zcl_abapgit_xml_output IMPLEMENTATION.
 
 
   METHOD add.

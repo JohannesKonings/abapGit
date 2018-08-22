@@ -66,7 +66,7 @@ CLASS ltcl_xml_output IMPLEMENTATION.
     ls_input-bar = 'A'.
 
     lv_value =
-      '<?xml version="1.0" encoding="utf-16"?>#<abapGit version="v1.0.0">#' &
+      '<?xml version="1.0" encoding="utf-8"?>#<abapGit version="v1.0.0">#' &
       ' <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">#' &
       '  <asx:values>#   <DATA>#    <FOO>2</FOO>#    <BAR>A' &
       '</BAR>#   </DATA>#  </asx:values># </asx:abap>#</abapGit>#'.
@@ -79,13 +79,12 @@ CLASS ltcl_xml_output IMPLEMENTATION.
 
     lv_xml = lo_output->render( ).
 
-    lv_encoding = cl_abap_codepage=>sap_codepage( `UTF-16LE` ).
+    lv_encoding = cl_abap_codepage=>sap_codepage( `UTF-8` ).
 
     TRY.
         lv_xstring = cl_bcs_convert=>string_to_xstring(
                        iv_string     = lv_value
-                       iv_codepage   = lv_encoding
-                       iv_add_bom    = 'X' ).
+                       iv_codepage   = lv_encoding ).
       CATCH cx_bcs.
     ENDTRY.
 

@@ -152,12 +152,6 @@ CLASS ZCL_ABAPGIT_OBJECTS_FILES IMPLEMENTATION.
     ls_file-filename = filename( iv_extra = iv_extra
                                  iv_ext   = 'xml' ).        "#EC NOTEXT
 
-    REPLACE FIRST OCCURRENCE
-      OF REGEX '<\?xml version="1\.0" encoding="[\w-]+"\?>'
-      IN lv_xml
-      WITH '<?xml version="1.0" encoding="utf-8"?>'.
-    ASSERT sy-subrc = 0.
-
     ls_file-data = zcl_abapgit_convert=>string_to_xstring_utf8( lv_xml ).
 
     APPEND ls_file TO mt_files.
