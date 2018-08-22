@@ -10,9 +10,6 @@ ENDCLASS.
 
 CLASS ltcl_xml_bom IMPLEMENTATION.
 
-
-
-
   METHOD delete_xml_bom_utf8.
 
     DATA: lv_xml             TYPE string,
