@@ -209,6 +209,11 @@ CLASS zcl_abapgit_objects DEFINITION
         it_results      TYPE zif_abapgit_definitions=>ty_results_tt
       RETURNING
         VALUE(rt_items) TYPE zif_abapgit_definitions=>ty_items_tt.
+    CLASS-METHODS delete_dependent_files
+      IMPORTING
+        !it_results       TYPE zif_abapgit_definitions=>ty_results_tt
+      RETURNING
+        VALUE(rt_results) TYPE zif_abapgit_definitions=>ty_results_tt .
 ENDCLASS.
 
 
@@ -678,6 +683,7 @@ CLASS zcl_abapgit_objects IMPLEMENTATION.
     DELETE rt_results WHERE obj_type IS INITIAL.
     DELETE rt_results WHERE lstate = zif_abapgit_definitions=>c_state-added AND rstate IS INITIAL.
 
+    rt_results = delete_dependent_files( rt_results ).
     rt_results = prioritize_deser( rt_results ).
 
     LOOP AT rt_results ASSIGNING <ls_result>.
@@ -784,6 +790,11 @@ CLASS zcl_abapgit_objects IMPLEMENTATION.
 
     FIELD-SYMBOLS: <ls_result> LIKE LINE OF it_results.
 
+* SPRX has to be handled before depended objects CLAS/INFT/TABL etc.
+    LOOP AT it_results ASSIGNING <ls_result> WHERE obj_type = 'SPRX'.
+      APPEND <ls_result> TO rt_results.
+    ENDLOOP.
+
 * XSLT has to be handled before CLAS/PROG
     LOOP AT it_results ASSIGNING <ls_result> WHERE obj_type = 'XSLT'.
       APPEND <ls_result> TO rt_results.
@@ -814,7 +825,8 @@ CLASS zcl_abapgit_objects IMPLEMENTATION.
         AND obj_type <> 'PROG'
         AND obj_type <> 'XSLT'
         AND obj_type <> 'PINF'
-        AND obj_type <> 'ENHS'.
+        AND obj_type <> 'ENHS'
+        AND obj_type <> 'SPRX'.
       APPEND <ls_result> TO rt_results.
     ENDLOOP.
 
@@ -1049,6 +1061,19 @@ CLASS zcl_abapgit_objects IMPLEMENTATION.
     rt_overwrite = lt_overwrite_uniqe.
 
   ENDMETHOD.
+
+  METHOD delete_dependent_files.
+
+    DATA ls_results LIKE LINE OF it_results.
+
+    rt_results = it_results.
+
+    LOOP AT it_results INTO ls_results WHERE obj_type = 'SPRX'.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
 
 
   METHOD is_active.

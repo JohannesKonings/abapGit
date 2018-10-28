@@ -130,6 +130,12 @@ CLASS zcl_abapgit_repo DEFINITION
       RAISING   zcx_abapgit_exception .
 
   PRIVATE SECTION.
+    METHODS:
+      delete_dependent_files
+        IMPORTING
+          it_tadir        TYPE zif_abapgit_definitions=>ty_tadir_tt
+        RETURNING
+          VALUE(rt_tadir) TYPE zif_abapgit_definitions=>ty_tadir_tt.
 
     METHODS: update_last_deserialize RAISING zcx_abapgit_exception.
 
@@ -292,6 +298,8 @@ CLASS zcl_abapgit_repo IMPLEMENTATION.
     CREATE OBJECT lo_progress
       EXPORTING
         iv_total = lines( lt_tadir ).
+
+    lt_tadir = delete_dependent_files( lt_tadir ).
 
     LOOP AT lt_tadir ASSIGNING <ls_tadir>.
       IF lv_filter_exist = abap_true.
@@ -667,4 +675,26 @@ CLASS zcl_abapgit_repo IMPLEMENTATION.
     set( it_checksums = lt_checksums ).
 
   ENDMETHOD.
+
+  METHOD delete_dependent_files.
+
+    DATA ls_tadir       LIKE LINE OF it_tadir.
+    DATA lv_object      TYPE trobjtype.
+    DATA lv_obj_name    TYPE sobj_name.
+
+
+    rt_tadir = it_tadir.
+
+    LOOP AT it_tadir INTO ls_tadir WHERE object = 'SPRX'.
+
+      lv_object = ls_tadir-obj_name(4).
+      lv_obj_name = ls_tadir-obj_name+4.
+
+      DELETE rt_tadir WHERE object   = lv_object
+                        AND obj_name = lv_obj_name.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
 ENDCLASS.

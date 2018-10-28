@@ -10,8 +10,9 @@ INHERITING FROM zcl_abapgit_objects_super
       zif_abapgit_object.
     METHODS constructor
       IMPORTING
-        is_item     TYPE zif_abapgit_definitions=>ty_item
-        iv_language TYPE spras.
+                is_item     TYPE zif_abapgit_definitions=>ty_item
+                iv_language TYPE spras
+      RAISING   zcx_abapgit_exception.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -34,6 +35,10 @@ INHERITING FROM zcl_abapgit_objects_super
         iv_package TYPE devclass
       RAISING
         zcx_abapgit_exception.
+    METHODS is_supported
+      RETURNING
+                VALUE(rv_is_supported) TYPE abap_bool
+      RAISING   zcx_abapgit_exception.
 
     DATA mv_object   TYPE sproxhdr-object.
     DATA mv_obj_name TYPE sproxhdr-obj_name.
@@ -42,7 +47,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_ABAPGIT_OBJECT_SPRX IMPLEMENTATION.
+CLASS zcl_abapgit_object_sprx IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -53,6 +58,10 @@ CLASS ZCL_ABAPGIT_OBJECT_SPRX IMPLEMENTATION.
       IMPORTING
         ev_object   = mv_object
         ev_obj_name = mv_obj_name ).
+
+    IF is_supported( ) = abap_false.
+      zcx_abapgit_exception=>raise( |SPRX - not supported: { is_item-obj_name }| ).
+    ENDIF.
 
   ENDMETHOD.
 
@@ -371,4 +380,42 @@ CLASS ZCL_ABAPGIT_OBJECT_SPRX IMPLEMENTATION.
         io_xml      = io_xml ).
 
   ENDMETHOD.
+
+  METHOD is_supported.
+
+    DATA lo_proxy           TYPE REF TO cl_proxy.
+    DATA ls_sprx_db_data    TYPE sprx_db_data.
+    DATA lt_delta           TYPE sprx_t_delta.
+
+    FIELD-SYMBOLS <ls_sproxheader>     LIKE LINE OF ls_sprx_db_data-sproxhdr.
+
+    rv_is_supported = abap_true.
+
+    TRY.
+        lo_proxy = cl_proxy_fact=>load_by_abap_name(
+            object             = mv_object
+            obj_name           = mv_obj_name ).
+
+
+        lt_delta = lo_proxy->get_delta_all( ).
+
+        ls_sprx_db_data = cl_proxy_db=>serialize(
+                                          proxy     = lo_proxy
+                                          inactive  = abap_false
+                                          delta     = lt_delta ).
+
+        "Only Service Consumer allowed. Service Provider will come later
+        LOOP AT ls_sprx_db_data-sproxhdr ASSIGNING <ls_sproxheader>.
+          IF <ls_sproxheader>-direction = 'I'.
+            rv_is_supported = abap_false.
+            EXIT.
+          ENDIF.
+        ENDLOOP.
+
+      CATCH cx_proxy_gen_error.
+        zcx_abapgit_exception=>raise( |SPRX - error load proxy { mv_obj_name }| ).
+    ENDTRY.
+
+  ENDMETHOD.
+
 ENDCLASS.
