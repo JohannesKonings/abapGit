@@ -112,13 +112,22 @@ CLASS zcl_abapgit_object_webi IMPLEMENTATION.
     LOOP AT is_webi-pvepfunction ASSIGNING <ls_function>.
 
       IF mi_vi->has_function( funcname = <ls_function>-function
-          version = sews_c_vif_version-active ) = abap_true.
+                              version  = sews_c_vif_version-active ) = abap_true.
         CONTINUE.
       ENDIF.
 
-      li_function = mi_vi->create_function(
-        funcname    = <ls_function>-function
-        mapped_name = <ls_function>-mappedname ).
+      IF mi_vi->has_function( funcname = <ls_function>-function
+                              version  = sews_c_vif_version-inactive ) = abap_true.
+
+        li_function = mi_vi->get_function( funcname = <ls_function>-function
+                                           version  = sews_c_vif_version-inactive ).
+
+      ELSE.
+
+        li_function = mi_vi->create_function( funcname    = <ls_function>-function
+                                              mapped_name = <ls_function>-mappedname ).
+
+      ENDIF.
 
       li_function->set_is_exposed( <ls_function>-is_exposed ).
 
@@ -182,7 +191,12 @@ CLASS zcl_abapgit_object_webi IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    li_soap = mi_vi->create_soap_extension_virtinfc( ls_soap-soap_appl_uri ).
+    IF  mi_vi->has_soap_extension_virtinfc( sews_c_vif_version-inactive ) = abap_true.
+      li_soap = mi_vi->get_soap_extension_virtinfc( sews_c_vif_version-inactive ).
+    ELSE.
+      li_soap = mi_vi->create_soap_extension_virtinfc( ls_soap-soap_appl_uri ).
+    ENDIF.
+
     li_soap->set_namespace( ls_soap-namespace ).
 
   ENDMETHOD.
