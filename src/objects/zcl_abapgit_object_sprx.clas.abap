@@ -391,6 +391,10 @@ CLASS zcl_abapgit_object_sprx IMPLEMENTATION.
 
     rv_is_supported = abap_true.
 
+    IF zif_abapgit_object~exists( ) = abap_false.
+      RETURN.
+    ENDIF.
+
     TRY.
         lo_proxy = cl_proxy_fact=>load_by_abap_name(
             object             = mv_object
