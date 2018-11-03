@@ -343,9 +343,9 @@ CLASS zcl_abapgit_object_sprx IMPLEMENTATION.
 
   METHOD zif_abapgit_object~serialize.
 
-    DATA ls_item        LIKE ms_item.
-    DATA lt_files       TYPE zif_abapgit_definitions=>ty_files_tt.
-    DATA ls_files       LIKE LINE OF lt_files.
+    DATA ls_item            LIKE ms_item.
+    DATA ls_files_and_item  TYPE zcl_abapgit_objects=>ty_serialization.
+    DATA ls_files           LIKE LINE OF ls_files_and_item-files.
 
     IF zif_abapgit_object~exists( ) = abap_false.
       RETURN.
@@ -356,15 +356,15 @@ CLASS zcl_abapgit_object_sprx IMPLEMENTATION.
     ls_item-obj_name    = mv_obj_name.
     ls_item-devclass    = ms_item-devclass.
 
-    lt_files = zcl_abapgit_objects=>serialize(
-                        is_item               = ls_item
-                        iv_language           = mv_language ).
+    ls_files_and_item = zcl_abapgit_objects=>serialize(
+                                  is_item               = ls_item
+                                  iv_language           = mv_language ).
 
     CASE mv_object.
 
       WHEN 'CLAS'.
 
-        LOOP AT lt_files INTO ls_files WHERE filename CP '*.abap'.
+        LOOP AT ls_files_and_item-files INTO ls_files WHERE filename CP '*.abap'.
 
           me->zif_abapgit_object~mo_files->add_raw(
               iv_ext                = 'abap'
@@ -420,6 +420,10 @@ CLASS zcl_abapgit_object_sprx IMPLEMENTATION.
         zcx_abapgit_exception=>raise( |SPRX - error load proxy { mv_obj_name }| ).
     ENDTRY.
 
+  ENDMETHOD.
+
+  METHOD zif_abapgit_object~is_active.
+    rv_active = abap_true. "dummy implementation
   ENDMETHOD.
 
 ENDCLASS.
